@@ -9,7 +9,7 @@ This project aims to provide a simple-to-use interface for Arduino users, and at
 Using Arduino-CLI:
 ```shellsession
 $ arduino-cli config set library.enable_unsafe_install true
-$ arduino-cli lib install --git-url https://git.example.com/arduino-bh1745.git
+$ arduino-cli lib install --git-url https://github.com/libewa/arduino-bh1745
 ```
 
 To use, include `BH1745.hpp` in your sketch file, and initialize one or two instances.
