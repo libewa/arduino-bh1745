@@ -21,7 +21,7 @@
 #define ADC_GAIN_X1 0x00
 #define RGB_EN 0x10
 
-BH1745::begin() {
+void BH1745::begin() {
     Wire.begin();
 }
 
