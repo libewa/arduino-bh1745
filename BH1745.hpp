@@ -12,9 +12,9 @@ class BH1745 {
         void getRGBC(uint16_t &r, uint16_t &g, uint16_t &b, uint16_t &c);
         void getRGBClamped(uint16_t &r, uint16_t &g, uint16_t &b);
         void getRGBScaled(uint16_t &r, uint16_t &g, uint16_t &b);
-        void setMeasurementTime(uint16_t time_ms);
+        bool setMeasurementTime(uint16_t time_ms);
         void setLED(bool enable);
-        void setADCGain(uint8_t gain);
+        bool setADCGain(uint8_t gain);
         void setChannelCompensation(float r, float g, float b, float c);
 
     private:

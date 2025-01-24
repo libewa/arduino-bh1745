@@ -92,7 +92,7 @@ void BH1745::getRGBScaled(uint16_t &r, uint16_t &g, uint16_t &b) {
     }
 }
 
-void BH1745::setMeasurementTime(uint16_t time_ms) {
+bool BH1745::setMeasurementTime(uint16_t time_ms) {
     uint8_t time_reg;
 
     switch (time_ms) {
@@ -115,17 +115,19 @@ void BH1745::setMeasurementTime(uint16_t time_ms) {
             time_reg = 0b101;
             break;
         default:
-            return; // Invalid time_ms
+            return false; // Invalid time_ms
     }
 
     writeRegister(MODE_CONTROL1, time_reg);
+
+    return true;
 }
 
 void BH1745::setLED(bool enable) {
     writeRegister(INTERRUPT, enable);
 }
 
-void BH1745::setADCGain(uint8_t gain) {
+bool BH1745::setADCGain(uint8_t gain) {
     switch (gain) {
         case 1:
             setADCGainRaw(0x00);
@@ -136,8 +138,9 @@ void BH1745::setADCGain(uint8_t gain) {
         case 16:
             setADCGainRaw(0x10) break;
         default:
-            break;
+            return false;
     }
+    return true;
 }
 
 void BH1745::setChannelCompensation(float r, float g, float b, float c) {
