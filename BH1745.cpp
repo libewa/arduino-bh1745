@@ -195,6 +195,6 @@ void BH1745::writeRegister(uint8_t reg, uint8_t value)
 void BH1745::setADCGainRaw(uint8_t value)
 {
     uint8_t mc2 = readRegister(MODE_CONTROL2);
-    mc2 = (mc2 & ~0x11) & value;
+    mc2 = (mc2 & ~0b11) & value;
     writeRegister(MODE_CONTROL2, mc2);
 }
