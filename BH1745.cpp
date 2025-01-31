@@ -1,4 +1,6 @@
 #include "BH1745.hpp"
+
+#include <Arduino.h>
 #include <Wire.h>
 
 // Register addresses
@@ -136,7 +138,8 @@ bool BH1745::setADCGain(uint8_t gain) {
             setADCGainRaw(0x01);
             break;
         case 16:
-            setADCGainRaw(0x10) break;
+            setADCGainRaw(0x10);
+            break;
         default:
             return false;
     }
@@ -154,7 +157,7 @@ uint8_t BH1745::readRegister(uint8_t reg) {
     Wire.beginTransmission(address);
     Wire.write(reg);
     Wire.endTransmission();
-    Wire.requestFrom(address, 1);
+    Wire.requestFrom(address, (uint8_t)1);
     return Wire.read();
 }
 
