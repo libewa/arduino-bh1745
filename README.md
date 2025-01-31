@@ -20,7 +20,7 @@ To use, include `BH1745.hpp` in your sketch file, and initialize one or two inst
 BH1745 colorSensor = BH1745();
 
 void setup() {
-    BH1745.begin();
+    BH1745::begin();
 }
 
 void loop() {

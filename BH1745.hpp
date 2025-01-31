@@ -8,7 +8,7 @@ class BH1745 {
         bool enableChannelCompensation;
 
         BH1745(uint8_t address = 0x38);
-        void begin();
+        static void begin();
         void getRGBC(uint16_t &r, uint16_t &g, uint16_t &b, uint16_t &c);
         void getRGBClamped(uint16_t &r, uint16_t &g, uint16_t &b);
         void getRGBScaled(uint16_t &r, uint16_t &g, uint16_t &b);
