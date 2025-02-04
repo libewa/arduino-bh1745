@@ -12,10 +12,10 @@ $ arduino-cli config set library.enable_unsafe_install true
 $ arduino-cli lib install --git-url https://codeberg.org/void_panic/arduino-bh1745.git
 ```
 
-To use, include `BH1745.hpp` in your sketch file, and initialize one or two instances.
+To use, include `BH1745.h` in your sketch file, and initialize one or two instances.
 
 ```ino
-#include <BH1745.hpp>
+#include <BH1745.h>
 
 BH1745 colorSensor = BH1745();
 

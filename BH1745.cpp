@@ -1,4 +1,4 @@
-#include "BH1745.hpp"
+#include "BH1745.h"
 
 #include <Arduino.h>
 #include <Wire.h>

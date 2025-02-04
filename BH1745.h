@@ -1,5 +1,5 @@
-#ifndef BH1745_hpp
-#define BH1745_hpp
+#ifndef BH1745_h
+#define BH1745_h
 
 #include <stdint.h>
 
