@@ -7,6 +7,7 @@ This project aims to provide a simple-to-use interface for Arduino users, and at
 
 ## Installation/Usage
 Using Arduino-CLI:
+
 ```shellsession
 $ arduino-cli config set library.enable_unsafe_install true
 $ arduino-cli lib install --git-url https://codeberg.org/void_panic/arduino-bh1745.git
