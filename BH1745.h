@@ -65,7 +65,7 @@ public:
 	* 
 	* @param time_ms The "exposure time", in Milliseconds, to set the sensor to.
 	*/
-    void setMeasurementTime(uint16_t time_ms);
+    bool setMeasurementTime(uint16_t time_ms);
 	
 	/** Enables or disables the external pin on the BH1745 chip.
 	* It is for example wired to two LEDs on the Pimoroni breakout.
@@ -78,7 +78,7 @@ public:
 	* 
 	* @param gain The ADC multiplier
 	*/
-    void setADCGain(uint8_t gain);
+    bool setADCGain(uint8_t gain);
 	
 	/** Sets the white balance values. They are multiplied with the raw sensor values if #enableWhiteBalance is true (default).
 	* @param r The compensation to apply to the red channel.

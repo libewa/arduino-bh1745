@@ -4,49 +4,51 @@
 #include <Wire.h>
 
 // Register addresses
-#define SYSTEM_CONTROL 0x40
-#define MODE_CONTROL1 0x41
-#define MODE_CONTROL2 0x42
-#define MODE_CONTROL3 0x44
-#define COLOUR_DATA 0x50
-#define INTERRUPT 0x60
-#define THRESHOLD 0x62
-#define MANUFACTURER 0x92
+#define SYSTEM_CONTROL  0x40
+#define MODE_CONTROL1   0x41
+#define MODE_CONTROL2   0x42
+#define MODE_CONTROL3   0x44
+#define COLOUR_DATA     0x50
+#define INTERRUPT       0x60
+#define THRESHOLD       0x62
+#define MANUFACTURER    0x92
 
 // Bit masks and settings
-#define SW_RESET 0x80
-#define INT_RESET 0x40
-#define PART_ID_MASK 0x3F
+#define SW_RESET        0b01000000
+#define INT_RESET       0b00100000
+#define PART_ID_MASK    0b00001111
 
-#define PART_ID 0x0B
+#define PART_ID         0b00001011
 #define MANUFACTURER_ID 0xE0
-#define ADC_GAIN_X1 0x00
-#define RGB_EN 0x10
 
 void BH1745::begin() {
     Wire.begin();
+#ifdef BH1745_DEBUG
+    Serial.begin(9600);
+#endif
 }
 
 BH1745::BH1745(uint8_t address) {
+    // "Power on time: t1: t1 should be more than 2ms ..."
+    delay(3);
     address = address;
-    setChannelCompensation(2.2, 1.0, 1.8, 10.0);
-    enableChannelCompensation = true;
+    setWhiteBalance(2.2, 1.0, 1.8, 10.0);
+    enableWhiteBalance = true;
 
     uint8_t part_id = readRegister(SYSTEM_CONTROL) & PART_ID_MASK;
     uint8_t manufacturer_id = readRegister(MANUFACTURER);
 
     if (part_id != PART_ID || manufacturer_id != MANUFACTURER_ID) {
         Serial.println("BH1745 not found: Manufacturer or Part ID mismatch!");
-        while (1)
-            ;
+        while (1);
     }
 
     writeRegister(SYSTEM_CONTROL, SW_RESET);
     delay(10);
     writeRegister(SYSTEM_CONTROL, INT_RESET);
     setMeasurementTime(320);
-    writeRegister(MODE_CONTROL2, ADC_GAIN_X1 | RGB_EN);
-    writeRegister(MODE_CONTROL3, true);
+    writeRegister(MODE_CONTROL2, 0b00010000); // enable rgbc with adc x1
+    writeRegister(MODE_CONTROL3, 0x02); // "just trust the specsheet" - Mensh123
 }
 
 void BH1745::getRGBC(uint16_t &r, uint16_t &g, uint16_t &b, uint16_t &c) {
@@ -58,7 +60,7 @@ void BH1745::getRGBC(uint16_t &r, uint16_t &g, uint16_t &b, uint16_t &c) {
     b = (data[5] << 8) | data[4];
     c = (data[7] << 8) | data[6];
 
-    if (enableChannelCompensation) {
+    if (enableWhiteBalance) {
         r = r * channelCompensation[0];
         g = g * channelCompensation[1];
         b = b * channelCompensation[2];
@@ -132,13 +134,13 @@ void BH1745::setLED(bool enable) {
 bool BH1745::setADCGain(uint8_t gain) {
     switch (gain) {
         case 1:
-            setADCGainRaw(0x00);
+            setADCGainRaw(0b00);
             break;
         case 2:
-            setADCGainRaw(0x01);
+            setADCGainRaw(0b01);
             break;
         case 16:
-            setADCGainRaw(0x10);
+            setADCGainRaw(0b10);
             break;
         default:
             return false;
@@ -146,7 +148,7 @@ bool BH1745::setADCGain(uint8_t gain) {
     return true;
 }
 
-void BH1745::setChannelCompensation(float r, float g, float b, float c) {
+void BH1745::setWhiteBalance(float r, float g, float b, float c) {
     channelCompensation[0] = r;
     channelCompensation[1] = g;
     channelCompensation[2] = b;
@@ -156,22 +158,31 @@ void BH1745::setChannelCompensation(float r, float g, float b, float c) {
 uint8_t BH1745::readRegister(uint8_t reg) {
     Wire.beginTransmission(address);
     Wire.write(reg);
-    Wire.endTransmission();
+    Wire.endTransmission(false);
     Wire.requestFrom(address, (uint8_t)1);
-    return Wire.read();
+    uint8_t res = Wire.read();
+    Wire.endTransmission();
+    return res;
 }
 
 void BH1745::readRegisters(uint8_t reg, uint8_t *data, uint8_t length) {
     Wire.beginTransmission(address);
     Wire.write(reg);
-    Wire.endTransmission();
+    Wire.endTransmission(false);
     Wire.requestFrom(address, length);
     for (uint8_t i = 0; i < length; i++) {
         data[i] = Wire.read();
     }
+    Wire.endTransmission();
 }
 
 void BH1745::writeRegister(uint8_t reg, uint8_t value) {
+#ifdef BH1745_DEBUG
+    Serial.print("Writing ");
+    Serial.print(value);
+    Serial.print(" to register ");
+    Serial.println(reg);
+#endif
     Wire.beginTransmission(address);
     Wire.write(reg);
     Wire.write(value);
