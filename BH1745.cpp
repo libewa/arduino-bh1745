@@ -32,23 +32,28 @@ BH1745::BH1745(uint8_t address) {
     // "Power on time: t1: t1 should be more than 2ms ..."
     delay(3);
     address = address;
+
     setWhiteBalance(2.2, 1.0, 1.8, 10.0);
     enableWhiteBalance = true;
+
+    modeControl2.valid = 0;
+    modeControl2.rgb_en = 1;
+    modeControl2.adc_gain = 0b00;
 
     uint8_t part_id = readRegister(SYSTEM_CONTROL) & PART_ID_MASK;
     uint8_t manufacturer_id = readRegister(MANUFACTURER);
 
     if (part_id != PART_ID || manufacturer_id != MANUFACTURER_ID) {
         Serial.println("BH1745 not found: Manufacturer or Part ID mismatch!");
-        while (1);
+        while (1) {}
     }
 
-    writeRegister(SYSTEM_CONTROL, SW_RESET);
-    delay(10);
-    writeRegister(SYSTEM_CONTROL, INT_RESET);
-    setMeasurementTime(320);
-    writeRegister(MODE_CONTROL2, 0b00010000); // enable rgbc with adc x1
-    writeRegister(MODE_CONTROL3, 0x02); // "just trust the specsheet" - Mensh123
+    writeRegister(SYSTEM_CONTROL, SW_RESET | INT_RESET | PART_ID);
+
+    setMeasurementTime(160);
+    writeRegister(MODE_CONTROL2, makeModeControl2());
+    writeRegister(MODE_CONTROL3, 0x02);
+    delay(5);
 }
 
 void BH1745::getRGBC(uint16_t &r, uint16_t &g, uint16_t &b, uint16_t &c) {
@@ -134,13 +139,13 @@ void BH1745::setLED(bool enable) {
 bool BH1745::setADCGain(uint8_t gain) {
     switch (gain) {
         case 1:
-            setADCGainRaw(0b00);
+            modeControl2.adc_gain = 0b00;
             break;
         case 2:
-            setADCGainRaw(0b01);
+            modeControl2.adc_gain = 0b01;
             break;
         case 16:
-            setADCGainRaw(0b10);
+            modeControl2.adc_gain = 0b10;
             break;
         default:
             return false;
@@ -189,8 +194,6 @@ void BH1745::writeRegister(uint8_t reg, uint8_t value) {
     Wire.endTransmission();
 }
 
-void BH1745::setADCGainRaw(uint8_t value) {
-    uint8_t mc2 = readRegister(MODE_CONTROL2);
-    mc2 = (mc2 & ~0b11) & value;
-    writeRegister(MODE_CONTROL2, mc2);
+uint8_t BH1745::makeModeControl2() {
+    return modeControl2.valid << 7 | modeControl2.rgb_en << 4 | modeControl2.adc_gain;
 }

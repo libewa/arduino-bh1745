@@ -27,9 +27,9 @@ void setup() {
 void loop() {
     // Blink LEDs (on Pimoroni breakout.)
     colorSensor.setLED(true);
-    sleep(200);
+    delay(200);
     colorSensor.setLED(false);
-    sleep(200)
+    delay(200);
 }
 ```
 
