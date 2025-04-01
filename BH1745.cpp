@@ -29,6 +29,7 @@ void BH1745::begin() {
 }
 
 BH1745::BH1745(uint8_t address) {
+    reset(); // safety
     // "Power on time: t1: t1 should be more than 2ms ..."
     delay(3);
     address = address;
@@ -45,15 +46,17 @@ BH1745::BH1745(uint8_t address) {
 
     if (part_id != PART_ID || manufacturer_id != MANUFACTURER_ID) {
         Serial.println("BH1745 not found: Manufacturer or Part ID mismatch!");
-        while (1) {}
+        return false;
     }
 
-    writeRegister(SYSTEM_CONTROL, SW_RESET | INT_RESET | PART_ID);
+    reset();
+    setBit(SYSTEM_CONTROL, 6, false);
 
     setMeasurementTime(160);
     writeRegister(MODE_CONTROL2, makeModeControl2());
-    writeRegister(MODE_CONTROL3, 0x02);
+    writeRegister(MODE_CONTROL3, 0x02); // Copied from documentation
     delay(5);
+    return true;
 }
 
 void BH1745::setBit(uint8_t reg, uint8_t bit, bool newValue) {
@@ -68,6 +71,13 @@ void BH1745::setBit(uint8_t reg, uint8_t bit, bool newValue) {
 
 bool BH1745::readBit(uint8_t reg, uint8_t bit) {
     return readRegister(reg) & (1 << bit);
+}
+
+void BH1745::reset() {
+    setBit(SYSTEM_CONTROL, 7, true);
+    while (readBit(SYSTEM_CONTROL, 7)) {
+        delay(100);
+    }
 }
 
 void BH1745::getRGBC(uint16_t &r, uint16_t &g, uint16_t &b, uint16_t &c) {

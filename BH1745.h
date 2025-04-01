@@ -20,10 +20,15 @@ public:
 	/// Whether to apply the white balance set with setWhiteBalance().
     bool enableWhiteBalance;
 
-	/** Initializes the BH1745 class. Optionally takes an address, as the chip supports changing it to 0x39 from the default 0x38.
+	/** Create the BH1745 class. Optionally takes an address, as the chip supports changing it to 0x39 from the default 0x38.
 	* @param address The chip's I2C bus address.
 	*/
     BH1745(uint8_t address = 0x38);
+
+    /** Establish a connection with the sensor.
+     * @returns `true` if initialization was successfull.
+     */
+    bool init();
 
     /// Calls `Wire.begin()` to initialize I2C.
     static void begin();
@@ -104,6 +109,8 @@ private:
     void readRegisters(uint8_t reg, uint8_t *data, uint8_t length);
     void writeRegister(uint8_t reg, uint8_t value);
     uint8_t makeModeControl2();
+
+    void reset();
 
     void setBit(uint8_t reg, uint8_t bit, bool newValue);
     bool readBit(uint8_t reg, uint8_t bit);
