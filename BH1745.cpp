@@ -56,6 +56,20 @@ BH1745::BH1745(uint8_t address) {
     delay(5);
 }
 
+void BH1745::setBit(uint8_t reg, uint8_t bit, bool newValue) {
+    uint8_t val = readRegister(reg);
+    uint8_t mask = ~(1 << bit);
+    val &= mask;
+    if (newValue == true) {
+        val |= 1 << bit;
+    }
+    writeRegister(reg, val);
+}
+
+bool BH1745::readBit(uint8_t reg, uint8_t bit) {
+    return readRegister(reg) & (1 << bit);
+}
+
 void BH1745::getRGBC(uint16_t &r, uint16_t &g, uint16_t &b, uint16_t &c) {
     uint8_t data[8];
     readRegisters(COLOUR_DATA, data, 8);

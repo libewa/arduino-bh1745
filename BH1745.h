@@ -104,6 +104,9 @@ private:
     void readRegisters(uint8_t reg, uint8_t *data, uint8_t length);
     void writeRegister(uint8_t reg, uint8_t value);
     uint8_t makeModeControl2();
+
+    void setBit(uint8_t reg, uint8_t bit, bool newValue);
+    bool readBit(uint8_t reg, uint8_t bit);
 };
 
 #endif
