@@ -157,7 +157,7 @@ bool BH1745::setMeasurementTime(uint16_t time_ms) {
 }
 
 void BH1745::setLED(bool enable) {
-    writeRegister(INTERRUPT, enable);
+    setBit(INTERRUPT, 0, enable);
 }
 
 bool BH1745::setADCGain(uint8_t gain) {
