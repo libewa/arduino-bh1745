@@ -29,9 +29,6 @@ void BH1745::begin() {
 }
 
 BH1745::BH1745(uint8_t address) {
-    reset(); // safety
-    // "Power on time: t1: t1 should be more than 2ms ..."
-    delay(3);
     address = address;
 
     setWhiteBalance(2.2, 1.0, 1.8, 10.0);
@@ -41,9 +38,15 @@ BH1745::BH1745(uint8_t address) {
     modeControl2.rgb_en = 1;
     modeControl2.adc_gain = 0b00;
 
+}
+
+bool BH1745::init() {
+    reset(); // safety
+    // "Power on time: t1: t1 should be more than 2ms ..."
     uint8_t part_id = readRegister(SYSTEM_CONTROL) & PART_ID_MASK;
     uint8_t manufacturer_id = readRegister(MANUFACTURER);
 
+    delay(3);
     if (part_id != PART_ID || manufacturer_id != MANUFACTURER_ID) {
         Serial.println("BH1745 not found: Manufacturer or Part ID mismatch!");
         return false;
