@@ -25,6 +25,7 @@ void BH1745::begin() {
     Wire.begin();
 #ifdef BH1745_DEBUG
     Serial.begin(9600);
+    Serial.println("This is arduino-BH1745 debug mode!");
 #endif
 }
 
@@ -41,12 +42,12 @@ BH1745::BH1745(uint8_t address) {
 }
 
 bool BH1745::init() {
-    reset(); // safety
     // "Power on time: t1: t1 should be more than 2ms ..."
+    delay(3);
+    reset(); // safety
+
     uint8_t part_id = readRegister(SYSTEM_CONTROL) & PART_ID_MASK;
     uint8_t manufacturer_id = readRegister(MANUFACTURER);
-
-    delay(3);
     if (part_id != PART_ID || manufacturer_id != MANUFACTURER_ID) {
         Serial.println("BH1745 not found: Manufacturer or Part ID mismatch!");
         return false;
@@ -188,12 +189,23 @@ void BH1745::setWhiteBalance(float r, float g, float b, float c) {
 }
 
 uint8_t BH1745::readRegister(uint8_t reg) {
+#ifdef BH1745_DEBUG
+    Serial.print("Reading register ");
+    Serial.print(reg);
+    Serial.println("…");
+#endif
     Wire.beginTransmission(address);
     Wire.write(reg);
     Wire.endTransmission(false);
     Wire.requestFrom(address, (uint8_t)1);
     uint8_t res = Wire.read();
     Wire.endTransmission();
+#ifdef BH1745_DEBUG
+    Serial.print("Register ");
+    Serial.print(reg);
+    Serial.print(" has the value ");
+    Serial.println(res);
+#endif
     return res;
 }
 
