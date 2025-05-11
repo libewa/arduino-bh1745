@@ -1,4 +1,5 @@
 #include "BH1745.h"
+#define BH1745_DEBUG
 
 #include <Arduino.h>
 #include <Wire.h>
@@ -9,8 +10,11 @@
 #define MODE_CONTROL2   0x42
 #define MODE_CONTROL3   0x44
 #define COLOUR_DATA     0x50
+#define DINT_DATA       0x58
 #define INTERRUPT       0x60
-#define THRESHOLD       0x62
+#define PERSISTENCE     0x61
+#define THRESHOLD_LOW   0x64
+#define THRESHOLD_HIGH  0x62
 #define MANUFACTURER    0x92
 
 // Bit masks and settings
@@ -18,7 +22,7 @@
 #define INT_RESET       0b00100000
 #define PART_ID_MASK    0b00001111
 
-#define PART_ID         0b00001011
+#define PART_ID         0b001011
 #define MANUFACTURER_ID 0xE0
 
 void BH1745::begin() {
@@ -56,10 +60,14 @@ bool BH1745::init() {
     reset();
     setBit(SYSTEM_CONTROL, 6, false);
 
-    setMeasurementTime(160);
+    setMeasurementTime(640);
     writeRegister(MODE_CONTROL2, makeModeControl2());
     writeRegister(MODE_CONTROL3, 0x02); // Copied from documentation
-    delay(5);
+    
+    setThresholdHigh(0);
+    setThresholdLow(0xFFFF);
+    setBit(INTERRUPT, 4, false);
+    delay(320);
     return true;
 }
 
@@ -127,6 +135,14 @@ void BH1745::getRGBScaled(uint16_t &r, uint16_t &g, uint16_t &b) {
     } else {
         r = g = b = 0;
     }
+}
+
+void BH1745::setThresholdHigh(uint16_t value) {
+    writeRegisters(THRESHOLD_HIGH, (uint8_t *)&value, 2);
+}
+
+void BH1745::setThresholdLow(uint16_t value) {
+    writeRegisters(THRESHOLD_LOW, (uint8_t *)&value, 2);
 }
 
 bool BH1745::setMeasurementTime(uint16_t time_ms) {
@@ -218,6 +234,13 @@ void BH1745::readRegisters(uint8_t reg, uint8_t *data, uint8_t length) {
         data[i] = Wire.read();
     }
     Wire.endTransmission();
+}
+
+void BH1745::writeRegisters(uint8_t startReg, uint8_t values[], uint8_t size) {
+    for (uint8_t i = 0; i < size; i++) {
+        uint8_t reg = i + startReg;
+        writeRegister(reg, values[i]);
+    }
 }
 
 void BH1745::writeRegister(uint8_t reg, uint8_t value) {

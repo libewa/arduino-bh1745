@@ -100,6 +100,9 @@ public:
 	*/
     void setWhiteBalance(float r, float g, float b, float c);
 
+		void setThresholdHigh(uint16_t value);
+		void setThresholdLow(uint16_t value);
+
 private:
 	uint8_t address;
     float channelCompensation[4];
@@ -108,6 +111,7 @@ private:
     uint8_t readRegister(uint8_t reg);
     void readRegisters(uint8_t reg, uint8_t *data, uint8_t length);
     void writeRegister(uint8_t reg, uint8_t value);
+		void BH1745::writeRegisters(uint8_t startReg, uint8_t values[], uint8_t size);
     uint8_t makeModeControl2();
 
     void reset();
