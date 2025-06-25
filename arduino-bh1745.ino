@@ -1,6 +1,6 @@
 #include "BH1745.h"
 
-BH1745 colorSensor = BH1745();
+BH1745 colorSensor = BH1745(0x39);
 
 uint16_t r, g, b, c;
 
@@ -21,10 +21,8 @@ void setup() {
 void loop() {
     // Blink LEDs (on Pimoroni breakout.)
     colorSensor.setLED(true);
-    digitalWrite(LED_BUILTIN, HIGH);
     delay(200);
     colorSensor.setLED(false);
-    digitalWrite(LED_BUILTIN, LOW);
     delay(200);
     colorSensor.getRGBC(r, b, g, c);
     Serial.println(r);

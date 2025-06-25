@@ -1,5 +1,4 @@
 #include "BH1745.h"
-#define BH1745_DEBUG
 
 #include <Arduino.h>
 #include <Wire.h>
